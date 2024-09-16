@@ -1,0 +1,48 @@
+#Using BeautifulSoup or the read_html function extract the table with Tesla Revenue and store it into a dataframe named tesla_revenue. The dataframe should have columns Date and Revenue.
+
+#Step-by-step instructions
+
+#Here are the step-by-step instructions:
+
+1. Find All Tables: Start by searching for all HTML tables on a webpage using `soup.find_all('table')`.
+2. Identify the Relevant Table: then loops through each table. If a table contains the text “Tesla Quarterly Revenue,”, select that table.
+3. Initialize a DataFrame: Create an empty Pandas DataFrame called `tesla_revenue` with columns “Date” and “Revenue.”
+4. Loop Through Rows: For each row in the relevant table, extract the data from the first and second columns (date and revenue).
+5. Clean Revenue Data: Remove dollar signs and commas from the revenue value.
+6. Add Rows to DataFrame: Create a new row in the DataFrame with the extracted date and cleaned revenue values.
+7. Repeat for All Rows: Continue this process for all rows in the table.
+Click here if you need help locating the table
+    
+#Below is the code to isolate the table, you will now need to loop through the rows and columns like in the previous lab
+    
+#soup.find_all("tbody")[1]
+    
+#If you want to use the read_html function the table is located at index 1
+
+#We are focusing on quarterly revenue in the lab.
+> Note: Instead of using the deprecated pd.append() method, consider using pd.concat([df, pd.DataFrame], ignore_index=True).
+
+tables = soup.find_all('table')
+
+for table in tables:
+    if "Tesla Quarterly Revenue," in table.text:
+        relevant_table = table
+        break
+import pandas as pd
+tesla_revenue = pd.DataFrame(columns=["Date", "Revenue"])
+
+rows = relevant_table.find_all('tr')
+for row in rows:
+    cols = row.find_all('td')
+    if len(cols) > 1:
+        date = cols[0].text
+        revenue = cols[1].text
+        
+        # Clean the revenue (remove dollar signs and commas)
+        revenue = revenue.replace('$', '').replace(',', '')
+        
+        # Add the row to the DataFrame
+        tesla_revenue = tesla_revenue.append({"Date": date, "Revenue": revenue}, ignore_index=True)
+
+new_row = pd.DataFrame([[date, revenue]], columns=["Date", "Revenue"])
+tesla_revenue = pd.concat([tesla_revenue, new_row], ignore_index=True)
